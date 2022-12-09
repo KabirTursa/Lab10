@@ -121,7 +121,7 @@ import java.util.*;
         System.out.println(tree.contains('t'));
         System.out.println(tree.contains('z'));
 
-        /*
+
         // Remove a node that is not in the tree
         tree.remove('e');
         System.out.println();
@@ -142,19 +142,70 @@ import java.util.*;
         tree.remove('c');
         System.out.println();
         tree.showElements();
-        */
+
     }
 
     // This next part is for extra credit. Comment this section out and use the
     // commented out lines in the main method to test your remove() functionality.
-    /*
+
     public void remove(char item) {
         root = removeFromSubtree(item, root);
     }
 
     private TreeNode removeFromSubtree(char item, TreeNode subtree) {
+         //no match
+         TreeNode trav = traverse(item, subtree);
+         if (trav == null)
+             return root;
 
+         //no children
+         if (trav.leftLink == null && trav.rightLink == null) {
+             trav = null;
+             return root;
+         }
+
+         //1 child (right)
+         if (trav.leftLink == null && trav.rightLink != null) {
+             trav.letter = trav.rightLink.letter;
+             trav.rightLink = trav.rightLink.rightLink;
+             return root;
+             //garbage collector helps us not get memory leaks
+         }
+
+         //1 child (left)
+         if (trav.leftLink != null && trav.rightLink == null) {
+             trav.letter = trav.leftLink.letter;
+             trav.leftLink = trav.leftLink.leftLink;
+             return root;
+             //garbage collector helps us not get memory leaks
+         }
+
+         //2 children
+
+         TreeNode r = trav.rightLink;
+         while (/*r != null && (not needed right now but good for expandability) */r.leftLink != null) {
+             r = r.leftLink;
+         }
+         trav.letter = r.letter;
+         r = null;
+        return root;
     }
 
-    */
+    private TreeNode traverse(char item, TreeNode subtree) {
+         if (subtree == null)
+             return null;
+         if (subtree.letter == item) {
+             return subtree;
+         }
+         TreeNode a = traverse(item, subtree.leftLink);
+         TreeNode b = traverse(item, subtree.rightLink);
+
+         if (a != null)
+             return a;
+         if (b != null)
+             return b;
+         return null;
+    }
+
+
 }
