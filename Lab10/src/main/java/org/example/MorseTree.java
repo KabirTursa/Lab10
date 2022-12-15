@@ -46,7 +46,8 @@ public class MorseTree {
 			//  call add() with this data
 			//  print out the letter and Morse string here for debugging
 
-		
+		    fin.close();
+            parser.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,18 +96,46 @@ public class MorseTree {
     
     //TODO: recursively complete this function.  Very similar to insertInSubtree()
 	private Character findInSubtree(String morseStr, TreeNode subtree) {
-		//base case 1 : subtree is null 
-		//base case 2 : morseStr is of length 0
-		//recursive case 1: the first char in morseStr is a '.', so recursively traverse tree
-		//recursive case 2: the first char in the morseStr is a '-', so re-curse accordingly
-		return null;  //remove this
+
+        //base case 1 : subtree is null
+        if (subtree == null) {
+            return null;
+        }
+
+        //base case 2 : morseStr is of length 0
+        if (morseStr.length() == 0) {
+            return (Character) subtree.data;
+        }
+        String condensed;
+        try {
+            condensed = morseStr.substring(1);
+        } catch (IndexOutOfBoundsException e) {
+            condensed = "";
+        }
+        //recursive case 1: the first char in morseStr is a '.', so recursively traverse tree
+        if (morseStr.charAt(0) == '.') {
+            return findInSubtree(condensed, subtree.right);
+        }
+        //recursive case 2: the first char in the morseStr is a '-', so recurse accordingly
+        if (morseStr.charAt(0) == '-') {
+            return findInSubtree(condensed, subtree.left);
+        }
+
+        //error. This should never return
+        return 'E';
 	}
     
     //TODO: Non-recursive function that calls other (recursive) functions
 	public String translateString(String tokens) {
 		String retVal = "";
 		//build a scanner here using tokens as input
+        Scanner s = new Scanner(tokens);
 		//iterate over the tokens calling translate on each token (substring separated by a space)
+        s.useDelimiter(" ");
+        while (s.hasNext()) {
+            char temp = translate(s.next());
+            retVal += temp;
+        }
 		//concat these characters and return them
 		
 		return retVal;
@@ -121,15 +150,52 @@ public class MorseTree {
         
         //when you've found the char c, report the path from the root to the node
         //and build the morse code by adding a "." when you go right, "-" when you go left
-        return new String("You wish.");
+        return toMorseHelper(root, c, "");
     }
+
+    private String toMorseHelper(TreeNode node, Character c, String morse) {
+        if (node == null)
+            return null;
+
+        if ((Character) node.data == c) {
+            return morse;
+        }
+
+        String a = toMorseHelper(node.left, c, morse + "-");
+        String b = toMorseHelper(node.right, c, morse + ".");
+
+        if (a != null)
+            return a;
+        if (b != null)
+            return b;
+        return null;
+    }
+
+
     public String toString() {
         return inorderWalk();
     }
     private String inorderWalk() {  
         
-        return new String("Another wish.");
-    }  
+        return inOrderHelper("", root);
+    }
+
+    private String inOrderHelper(String s, TreeNode node) {
+
+        if (node.left == null)
+            s += node.data;
+        else {
+            s += inOrderHelper(s, node.left);
+            s += node.data;
+            if (node.right != null)
+                s += inOrderHelper(s, node.right);
+            else {
+                //do nothing
+            }
+        }
+
+        return s;
+    }
     
     public static void main(String[] args) {
         MorseTree mt = new MorseTree();  //builds our tree using data from a file
